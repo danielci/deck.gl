@@ -24,6 +24,7 @@ import {
   WebMercatorViewport,
   _GPUGridAggregator as GPUGridAggregator,
   AGGREGATION_OPERATION,
+  createIterable,
   log
 } from '@deck.gl/core';
 const {defaultColorRange} = experimental;
@@ -266,11 +267,12 @@ export default class ScreenGridLayer extends Layer {
     const colorWeights = [];
     const {weights} = this.state;
 
-    for (const point of data) {
-      const position = getPosition(point);
+    // TODO - using array.push is expensive
+    for (const object of createIterable(data)) {
+      const position = getPosition(object.element, object);
       positions.push(position[0]);
       positions.push(position[1]);
-      colorWeights.push(...this._getWeight(point));
+      colorWeights.push(...this._getWeight(object.element, object));
     }
     weights.color.values = colorWeights;
     this.setState({positions});
